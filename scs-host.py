@@ -8,7 +8,7 @@ app = Flask(__name__)
 def createSSHKeypair():
     params = request.get_json()
     os.system(
-        f'./create-ssh-keypair.sh "{params["userId"]}" "{params["fn"]}" "{params["url"]}"')
+        f'./script/create-ssh-keypair.sh "{params["userId"]}" "{params["fn"]}" "{params["url"]}"')
     return jsonify({"ok": True})
 
 
