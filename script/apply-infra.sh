@@ -30,25 +30,14 @@ for row in $(echo $desc | yq -oj eval . | jq '.instances' | jq -r '.[] | @base64
   instanceSpec=$(_jq '.instanceSpec')
   instanceType=$(_jq '.instanceType')
 
-  case $instanceType in
-    normal)
-      template=$("normal-template.tf")
-      ;;
-    spot)
-      template=$("instance-template.tf")
-      ;;
-    mysql)
-      template=$("rdb-template.tf")
-      ;;
-    redis)
-      template=$("redis-template.tf")
-      ;;
-  esac
-
-  cp $template instance-$instanceName.tf
+  # normal, spot, rds, redis
+  cp $instanceType-template.tf instance-$instanceName.tf
 
   sed -i "s/%%keyname%%/${privateKey}/g; s/%%instancename%%/${infraName}#${instanceName}/g; s/%%instancespec%%/${instanceSpec}/g" instance-$instanceName.tf
 done
+
+# remove templates
+rm *-template.tf
 
 # apply
 terraform apply -auto-approve
