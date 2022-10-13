@@ -12,5 +12,15 @@ def createSSHKeypair():
     return jsonify({"ok": True})
 
 
+@app.route('/apply-infra', methods=['POST'])
+def applyInfra():
+    params = request.get_json()
+
+    os.system(
+        f'./script/apply-infra "{params["privateKey"]}" "{params["desc"]}"'
+    )
+    return jsonify({"ok": True})
+
+
 if __name__ == "__main__":
     app.run()
