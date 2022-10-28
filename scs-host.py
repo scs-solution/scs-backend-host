@@ -4,6 +4,12 @@ import os
 app = Flask(__name__)
 
 
+async def applyInfraInternal(params):
+    os.system(
+        f'./script/apply-infra "{params["privateKey"]}" "{params["desc"]}" "{params["updateKey"]}"'
+    )
+
+
 @app.route('/create-ssh-keypair', methods=['POST'])
 def createSSHKeypair():
     params = request.get_json()
@@ -15,10 +21,7 @@ def createSSHKeypair():
 @app.route('/apply-infra', methods=['POST'])
 def applyInfra():
     params = request.get_json()
-
-    os.system(
-        f'./script/apply-infra "{params["privateKey"]}" "{params["desc"]}"'
-    )
+    applyInfraInternal(params)
     return jsonify({"ok": True})
 
 

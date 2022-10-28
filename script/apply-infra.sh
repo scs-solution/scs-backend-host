@@ -1,6 +1,7 @@
 #!/bin/bash
 privateKey=$1
 desc=$2
+updateKey=$3
 
 # replace exsists terraform
 infraName=$(echo $desc | yq -oj eval . | jq -r '.name')
@@ -53,10 +54,15 @@ terraform apply -auto-approve
 aws s3api put-object --bucket scs-tfstate --key $infraName --body terraform.tfstate
 
 # get instance id
-echo "aws_spot_instance_request.test_infra1-test_instance.public_ip" | terraform console
+echo "aws_spot_instance_request.${infraName}-${instanceName}.public_ip" | terraform console
+
+# sync with backend database
+cd ..
+python3 sync-infra-db.py "${infraName}" "${infraName}/terraform.tfstate" "${updateKey}"
 
 # remove template
 cd ..
 rm -rf $infraName
+
 # remove key
 rm $privateKey
