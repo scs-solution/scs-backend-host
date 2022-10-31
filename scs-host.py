@@ -6,7 +6,13 @@ app = Flask(__name__)
 
 async def applyInfraInternal(params):
     os.system(
-        f'./script/apply-infra "{params["privateKey"]}" "{params["desc"]}" "{params["updateKey"]}"'
+        f'./script/apply-infra.sh "{params["privateKey"]}" "{params["desc"]}" "{params["updateKey"]}"'
+    )
+
+
+async def handleSpotTerminationInternal(params):
+    os.system(
+        f'./script/handle-spot-instance.sh "{params["target"]}" "{params["privateKey"]}" "{params["desc"]}" "{params["updateKey"]}"'
     )
 
 
@@ -22,6 +28,13 @@ def createSSHKeypair():
 def applyInfra():
     params = request.get_json()
     applyInfraInternal(params)
+    return jsonify({"ok": True})
+
+
+@app.route('/handle-spot-termination', methods=['POST'])
+def handleSpotTermination():
+    params = request.get_json()
+    handleSpotTerminationInternal(params)
     return jsonify({"ok": True})
 
 
