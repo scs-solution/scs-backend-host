@@ -12,12 +12,12 @@ with open(tfstateFile, 'r', encoding='utf-8') as f:
     data = json.load(f)
 
     for res in data['resources']:
-        if res['type'] is 'aws_spot_instance_request':
+        if res['type'] == 'aws_spot_instance_request':
             instances.append({
                 'name': res['name'],
-                'instanceId': res['instances']['attributes']['spot_instance_id'],
-                'privateIp': res['instances']['attributes']['private_ip'],
-                'publicIp': res['instances']['attributes']['public_ip'],
+                'instanceId': res['instances'][0]['attributes']['spot_instance_id'],
+                'privateIp': res['instances'][0]['attributes']['private_ip'],
+                'publicIp': res['instances'][0]['attributes']['public_ip'],
             })
 
 updateDto = {
