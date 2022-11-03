@@ -1,4 +1,4 @@
-sudo pip3 install gunicorn flask
+sudo pip3 install gunicorn flask requests
 
 sudo yum install -y yum-utils
 sudo yum-config-manager --add-repo https://rpm.releases.hashicorp.com/AmazonLinux/hashicorp.repo
