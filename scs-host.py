@@ -1,19 +1,21 @@
 from flask import Flask, request, jsonify
 import os
-import asyncio
+import subprocess
 
 app = Flask(__name__)
 
 
-async def applyInfraInternal(params):
-    os.system(
-        f'./script/apply-infra.sh "{params["privateKey"]}" "{params["desc"]}" "{params["updateKey"]}"'
+def applyInfraInternal(params):
+    subprocess.Popen(
+        [f'./script/apply-infra.sh',
+            f'{params["privateKey"]}', f'{params["desc"]}', f'{params["updateKey"]}']
     )
 
 
-async def handleSpotTerminationInternal(params):
-    os.system(
-        f'./script/handle-spot-instance.sh "{params["target"]}" "{params["privateKey"]}" "{params["desc"]}" "{params["updateKey"]}"'
+def handleSpotTerminationInternal(params):
+    subprocess.Popen(
+        [f'./script/handle-spot-instance.sh',
+            f'{params["target"]}', f'{params["privateKey"]}', f'{params["desc"]}', f'{params["updateKey"]}']
     )
 
 
@@ -28,16 +30,14 @@ def createSSHKeypair():
 @app.route('/apply-infra', methods=['POST'])
 def applyInfra():
     params = request.get_json()
-    loop = asyncio.get_event_loop()
-    loop.create_task(applyInfraInternal(params))
+    applyInfraInternal(params)
     return jsonify({"ok": True})
 
 
 @app.route('/handle-spot-termination', methods=['POST'])
 def handleSpotTermination():
     params = request.get_json()
-    loop = asyncio.get_event_loop()
-    loop.create_task(handleSpotTerminationInternal(params))
+    handleSpotTerminationInternal(params)
     return jsonify({"ok": True})
 
 
