@@ -61,7 +61,6 @@ cd ..
 python3 ./script/sync-infra-db.py "${infraName}" "${infraName}/terraform.tfstate" "${updateKey}"
 
 # remove template
-cd ..
 rm -rf $infraName
 
 # remove key
