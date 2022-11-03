@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 import os
+import asyncio
 
 app = Flask(__name__)
 
@@ -27,14 +28,16 @@ def createSSHKeypair():
 @app.route('/apply-infra', methods=['POST'])
 def applyInfra():
     params = request.get_json()
-    applyInfraInternal(params)
+    loop = asyncio.get_event_loop()
+    loop.create_task(applyInfraInternal(params))
     return jsonify({"ok": True})
 
 
 @app.route('/handle-spot-termination', methods=['POST'])
 def handleSpotTermination():
     params = request.get_json()
-    handleSpotTerminationInternal(params)
+    loop = asyncio.get_event_loop()
+    loop.create_task(handleSpotTerminationInternal(params))
     return jsonify({"ok": True})
 
 
