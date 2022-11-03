@@ -58,7 +58,7 @@ echo "aws_spot_instance_request.${infraName}-${instanceName}.public_ip" | terraf
 
 # sync with backend database
 cd ..
-python3 sync-infra-db.py "${infraName}" "${infraName}/terraform.tfstate" "${updateKey}"
+python3 ./script/sync-infra-db.py "${infraName}" "${infraName}/terraform.tfstate" "${updateKey}"
 
 # remove template
 cd ..
