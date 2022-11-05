@@ -12,6 +12,13 @@ def applyInfraInternal(params):
     )
 
 
+def initInstance(params):
+    subprocess.Popen(
+        [f"./script/init-instance.sh",
+            f'{params["instance"]}', f'{params["privateKey"]}', f'{params["updateKey"]}']
+    )
+
+
 def handleSpotTerminationInternal(params):
     subprocess.Popen(
         [f'./script/handle-spot-instance.sh',
@@ -31,6 +38,13 @@ def createSSHKeypair():
 def applyInfra():
     params = request.get_json()
     applyInfraInternal(params)
+    return jsonify({"ok": True})
+
+
+@app.route('/init-instance', methods=['POST'])
+def initInstance():
+    params = request.get_json()
+    initInstance(params)
     return jsonify({"ok": True})
 
 
