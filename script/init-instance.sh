@@ -14,7 +14,4 @@ runScript=$(echo $initalDesc | yq -oj eval . | jq -r '.runScript')
 aws s3api get-object --bucket scs-user-pks --key $privateKey.key $privateKey
 chmod 700 $privateKey
 
-
-
-
 rm $privateKey
