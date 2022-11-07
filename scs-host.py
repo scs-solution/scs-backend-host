@@ -12,7 +12,7 @@ def applyInfraInternal(params):
     )
 
 
-def initInstance(params):
+def initInstanceInternal(params):
     subprocess.Popen(
         [f"./script/init-instance.sh",
             f'{params["instance"]}', f'{params["privateKey"]}', f'{params["updateKey"]}']
@@ -44,7 +44,7 @@ def applyInfra():
 @app.route('/init-instance', methods=['POST'])
 def initInstance():
     params = request.get_json()
-    initInstance(params)
+    initInstanceInternal(params)
     return jsonify({"ok": True})
 
 
