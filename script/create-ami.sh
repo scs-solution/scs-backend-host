@@ -13,6 +13,7 @@ AMI_NAME_TARGET=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16)
 
 # Region in which creating AMI.
 REGION="ap-northeast-2"
+
 # The type of EC2 instance used to build the AMI.
 TYPE="t2.nano"
 
@@ -46,15 +47,16 @@ ssh-keygen -f ./../$privateKey -y > _$privateKey.pub
 # 기존 보안그룹이 인바운드 ssh 연결을 허용한다고 가정 
 # 그렇지 않으면 security group을 사용해야 한다.
 
-# aws ec2 run-instances \
-#     --region $REGION \
-#     --image-id $AMI_ID_BASE \
-#     --count 1 \
-#     --block-device-mappings file://device-mapping.json \
-#     --instance-type $TYPE \
-#     --key-name _$privateKey.pub \
-#     >$JSON_EC2
+aws ec2 run-instances \
+    --region $REGION \
+    --image-id $AMI_ID_BASE \
+    --count 1 \
+    --block-device-mappings file://device-mapping.json \
+    --instance-type $TYPE \
+    --key-name $KEYPAIR \
+    >$JSON_EC2
 
+# 위의 $KEYPAIR에 _$privateKey.pubs 이거 넣어도되나>?
 
 INSTANCE_ID=$(jq -r '.Instances[0].InstanceId' $JSON_EC2)
 
@@ -136,3 +138,6 @@ aws ec2 run-instances \
 --count 1 \
 --instance-type $desc[2] \
 --key-name $KEYPAIR
+
+
+#https://datawookie.dev/blog/2021/07/creating-an-ami-using-the-aws-cli/
