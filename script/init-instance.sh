@@ -21,7 +21,7 @@ echo $runScript >> client-run-script.sh
 
 chmod +x client-init-script.sh client-run-script.sh
 
-sleep 15
+sleep 60
 
 scp -o StrictHostKeyChecking=no -i $privateKey ./script/common-init-script.sh ec2-user@$privateIp:/home/ec2-user/
 scp -o StrictHostKeyChecking=no -i $privateKey ./client-init-script.sh ec2-user@$privateIp:/home/ec2-user/
