@@ -27,9 +27,9 @@ scp -o StrictHostKeyChecking=no -i $privateKey ./script/common-init-script.sh ec
 scp -o StrictHostKeyChecking=no -i $privateKey ./client-init-script.sh ec2-user@$privateIp:/home/ec2-user/
 scp -o StrictHostKeyChecking=no -i $privateKey ./client-run-script.sh ec2-user@$privateIp:/home/ec2-user/
 
-ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp ./home/ec2-user/common-init-script.sh
-ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp ./home/ec2-user/client-init-script.sh
-ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp ./home/ec2-user/client-run-script.sh
+ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp /home/ec2-user/common-init-script.sh
+ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp /home/ec2-user/client-init-script.sh
+ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp /home/ec2-user/client-run-script.sh
 
 rm $privateKey
 rm client-init-script.sh
