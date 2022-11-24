@@ -26,6 +26,10 @@ def handleSpotTerminationInternal(params):
     )
 
 
+def createAMIInternal(params):
+    subprocess.Popen([f'./script/create-ami.sh'])
+
+
 @app.route('/create-ssh-keypair', methods=['POST'])
 def createSSHKeypair():
     params = request.get_json()
@@ -52,6 +56,13 @@ def initInstance():
 def handleSpotTermination():
     params = request.get_json()
     handleSpotTerminationInternal(params)
+    return jsonify({"ok": True})
+
+
+@app.route('/create-ami', methods=['POST'])
+def createAMI():
+    params = request.get_json()
+    createAMIInternal(params)
     return jsonify({"ok": True})
 
 
