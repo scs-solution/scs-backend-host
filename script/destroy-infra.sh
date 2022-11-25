@@ -48,7 +48,7 @@ rm provider.tf
 terraform init
 
 # destroy
-terraform destory -auto-approve
+terraform destroy -auto-approve
 
 # sync with backend database
 cd ..
