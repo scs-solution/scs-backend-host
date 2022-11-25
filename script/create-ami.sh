@@ -1,4 +1,4 @@
-!/bin/bash
+#!/bin/bash
 # target=$1 #aws instance id
 # privateKey=$2 #ssh 접속 할 수 있는 비밀 키 
 # desc=$3 #인프라 description name,endpoint,instances
