@@ -50,6 +50,10 @@ terraform init
 # destroy
 terraform destory -auto-approve
 
+# sync with backend database
+cd ..
+python3 ./script/sync-infra-db.py "${infraName}" "${infraName}/terraform.tfstate" "${updateKey}"
+
 # remove template
 rm -rf $infraName
 
