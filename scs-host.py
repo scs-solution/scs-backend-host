@@ -34,7 +34,10 @@ def handleSpotTerminationInternal(params):
 
 
 def createAMIInternal(params):
-    subprocess.Popen([f'./script/create-ami.sh'])
+    subprocess.Popen(
+        [f'./script/create-ami.sh',
+         f'{params["instanceId"]}', f'{params["latestAMI"]}', f'{params["updateKey"]}']
+    )
 
 
 @app.route('/create-ssh-keypair', methods=['POST'])
