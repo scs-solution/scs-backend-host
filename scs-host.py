@@ -12,6 +12,13 @@ def applyInfraInternal(params):
     )
 
 
+def destroyInfraInternal(params):
+    subprocess.Popen(
+        [f'./script/destroy-infra.sh',
+            f'{params["privateKey"]}', f'{params["desc"]}', f'{params["updateKey"]}']
+    )
+
+
 def initInstanceInternal(params):
     subprocess.Popen(
         [f"./script/init-instance.sh",
@@ -42,6 +49,13 @@ def createSSHKeypair():
 def applyInfra():
     params = request.get_json()
     applyInfraInternal(params)
+    return jsonify({"ok": True})
+
+
+@app.route('/destroy-infra', methods=['POST'])
+def destroyInfra():
+    params = request.get_json()
+    destroyInfraInternal(params)
     return jsonify({"ok": True})
 
 
