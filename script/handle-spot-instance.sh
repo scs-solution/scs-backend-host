@@ -30,82 +30,33 @@ for row in $(echo $desc | yq -oj eval . | jq '.instances' | jq -r '.[] | @base64
 done
 
 
-# ami를 활용해 ec2만들기
-aws ec2 run-instances \
+
+
+#ebs id 불러오기
+
+export ebsId=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instanceId --query 'Volumes[0].VolumeId' --output text)
+
+
+# ebs snapshot 따기 
+export ebsSnapshot=$(aws ec2 create-snapshot --volume-id $ebsId)
+
+
+
+# ami를 활용해 새로운 ec2만들기
+export newInstanceId=$(aws ec2 run-instances \
 --region $REGION \
 --image-id $AMI_ID_TARGET \
 --count 1 \
 --instance-type $instanceType \
---key-name $privateKey
+--key-name $privateKey  --query 'Instances[0].InstanceId' --output text)
 
-#기존의 ec2의 ebs 뽑기 
+# instance에 ebs 붙이기 
+aws ec2 attach-volume --volume-id $ebsSnapshot --instance-id $newInstanceId --device /dev/sdf
 
+#기존 ec2 제거 
 
+aws ec2 terminate-instances --region $REGION --instance-ids $instanceId
 
-
-
-# replace exsists terraform
-#infraName=$(echo $desc | yq -oj eval . | jq -r '.name')
-
-# download privateKey
-#aws s3api get-object --bucket scs-user-pks --key $privateKey.key $privateKey
-#chmod 700 $privateKey
-
-# clone infra template
-#git clone https://github.com/scs-solution/scs-infra-template $infraName
-#cd $infraName
-
-# generate public key from private key
-#ssh-keygen -f ./../$privateKey -y > _$privateKey.pub
-
-# download secret.tf
-#aws s3api get-object --bucket scs-config --key secret.tf secret.tf
-
-# download tfstate.tf
-#aws s3api get-object --bucket scs-tfstate --key $infraName terraform.tfstate
-
-#for row in $(echo $desc | yq -oj eval . | jq '.instances' | jq -r '.[] | @base64'); do
-##  _jq() {
- #  echo ${row} | base64 --decode | jq -r ${1}
-#  }
-
-#  instanceName=$(_jq '.name')
-#  instanceSpec=$(_jq '.instanceSpec')
-#  instanceType=$(_jq '.instanceType')
-
-  # normal, spot, rds, redis
-#  cp $instanceType-template.tf instance-$instanceName.tf
-
-##  sed -i "s/%%keyname%%/_${privateKey}/g; s/%%instancename%%/${infraName}-${instanceName}/g; s/%%instancespec%%/${instanceSpec}/g" instance-$instanceName.tf
-#done
-
-# remove templates
-#rm *-template.tf
-
-# remove provider.tf
-#rm provider.tf
-
-# init
-#terraform init
-
-# apply
-#terraform apply -auto-approve
-
-# upload tfstate.tf
-#aws s3api put-object --bucket scs-tfstate --key $infraName --body terraform.tfstate
-
-# get instance id
-#echo "aws_spot_instance_request.${infraName}-${instanceName}.public_ip" | terraform console
-
-# sync with backend database
-
-
-
-# remove template
-#rm -rf $infraName
-
-# remove key
-#rm $privateKey
 
 
 
@@ -117,17 +68,17 @@ aws ec2 run-instances \
 
 #Step1: Launch an EC2 Instance and save the instance ID into an environment variable
 
-instance_id=$(aws ec2 run-instances --image-id ami-55ef662f --instance-type t2.micro --key-name MyKeyPair1 --user-data file://userdata.txt  --query 'Instances[*].[InstanceId]' --output text )
+#instance_id=$(aws ec2 run-instances --image-id ami-55ef662f --instance-type t2.micro --key-name MyKeyPair1 --user-data file://userdata.txt  --query 'Instances[*].[InstanceId]' --output text )
 
 
 #Step 2: Check the user data worked and the web server is running by typing the web server IP on a browser and verifying you see ÒHello WorldÓ
 
 #Step 3: Create an image from that instance ID and save the image id to a variable image_id
-image_id=$(aws ec2 create-image --instance-id $instance_id --name "My server" --description "An AMI for my webserver" --query ImageId --output text)
+#image_id=$(aws ec2 create-image --instance-id $instance_id --name "My server" --description "An AMI for my webserver" --query ImageId --output text)
 
 #step 4: use that image to launch an instance
-aws ec2 run-instances --image-id $image_id --instance-type t2.micro --key-name MyKeyPair1   --query 'Instances[*].[InstanceId]' --output text 
-i-03c84ceb5391371b6
+#aws ec2 run-instances --image-id $image_id --instance-type t2.micro --key-name MyKeyPair1   --query 'Instances[*].[InstanceId]' --output text 
+#i-03c84ceb5391371b6
 
 #Step 5: verify the web server is running by typing  the IP address on a browser
 
