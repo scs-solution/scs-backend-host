@@ -37,10 +37,10 @@ done
 export ebsId=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instanceId --query 'Volumes[0].VolumeId' --output text)
 
 
-#eip 불러오기
+#기존 ec2의 eip 불러오기
 export eipAddress=$(aws ec2 describe-instances --instance-ids $instanceId --filter --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
 
-# ebs snapshot 따기 
+#기존 ec2의 ebs snapshot 따기 
 export ebsSnapshot=$(aws ec2 create-snapshot --volume-id $ebsId)
 
 
@@ -53,7 +53,7 @@ export newInstanceId=$(aws ec2 run-instances \
 --instance-type $instanceType \
 --key-name $privateKey  --query 'Instances[0].InstanceId' --output text)
 
-# instance에 ebs 붙이기 
+# 새로만든 ec2 instance에 ebs 붙이기 
 aws ec2 attach-volume --volume-id $ebsSnapshot --instance-id $newInstanceId --device /dev/sdf
 
 #기존 ec2 제거 
