@@ -10,11 +10,11 @@ updateKey=$3  # handling 완료했을 떄 backend로 신호보내기
 
 
 # The name of the base AMI (Ubuntu 20.04).
-AMI_ID_BASE="ami-00399ec92321828f5"
+#AMI_ID_BASE="ami-00399ec92321828f5"
 
 # The name of the custom AMI.
 # 랜덤값 생성해서 넣기
-AMI_NAME_TARGET=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16)
+#AMI_NAME_TARGET=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16)
 
 # Region in which creating AMI.
 REGION="ap-northeast-2"
@@ -100,34 +100,30 @@ ssh-keygen -f ./../$privateKey -y > _$privateKey.pub
 
 #Create the AMI
 
-aws ec2 describe-images \
-    --region $REGION \
-    --filters "Name=name,Values=$AMI_NAME_TARGET" \
-    >$JSON_AMI
+# aws ec2 describe-images \
+#     --region $REGION \
+#     --filters "Name=name,Values=$AMI_NAME_TARGET" \
+#     >$JSON_AMI
 
-#이름 중복검사를 통해 만약 있다면 등록을 취소한다.
-AMI_ID_TARGET=$(jq -r '.Images[0].ImageId' $JSON_AMI)
+# #이름 중복검사를 통해 만약 있다면 등록을 취소한다.
+# AMI_ID_TARGET=$(jq -r '.Images[0].ImageId' $JSON_AMI)
 
-if [ $AMI_ID_TARGET != "null" ]
-then
-   aws ec2 deregister-image --region $REGION --image-id $AMI_ID_TARGET
-fi
+# if [ $AMI_ID_TARGET != "null" ]
+# then
+#    aws ec2 deregister-image --region $REGION --image-id $AMI_ID_TARGET
+# fi
 
-
-#기존의 ami 삭제
-aws ec2 deregister-image --region $REGION --image-id $latestAMI
 
 #이제 진짜 ami 생성 
 
 aws ec2 create-image \
     --region $REGION \
     --instance-id $instanceId \
-    --name "$AMI_NAME_TARGET" \
     --no-reboot \
     >$JSON_AMI
 
-#custom ami 생성 완료 
-
+#기존의 ami 삭제
+aws ec2 deregister-image --region $REGION --image-id $latestAMI
 
 #Terminate the EC2 Instance
 #Finally we can terminate the EC2 instance weused to build the AMI.
@@ -136,9 +132,11 @@ aws ec2 create-image \
 #aws ec2 terminate-instances --region $REGION --instance-ids $INSTANCE_ID
 
 
-#만들어진 custom ami id :
+#만들어진 ami id :
 
 AMI_ID_TARGET=$(jq -r '.ImageId' $JSON_AMI)
+echo $AMI_ID_TARGET
+
 
 # custom ami를 활용해 ec2만들기
 # aws ec2 run-instances \
