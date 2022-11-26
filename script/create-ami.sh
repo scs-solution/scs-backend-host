@@ -46,7 +46,7 @@ JSON_AMI="ami-details.json"
 
 
 # generate public key from private key
-ssh-keygen -f ./../$privateKey -y > _$privateKey.pub
+# ssh-keygen -f ./../$privateKey -y > _$privateKey.pub
 
 #Launch an EC2 Instance
 # 기존 보안그룹이 인바운드 ssh 연결을 허용한다고 가정 
