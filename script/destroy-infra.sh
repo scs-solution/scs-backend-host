@@ -23,6 +23,8 @@ aws s3api get-object --bucket scs-config --key secret.tf secret.tf
 # download tfstate.tf
 aws s3api get-object --bucket scs-tfstate --key $infraName terraform.tfstate
 
+sed -i "s/%%keyname%%/_${privateKey}/g" common.tf
+
 for row in $(echo $desc | yq -oj eval . | jq '.instances' | jq -r '.[] | @base64'); do
   _jq() {
    echo ${row} | base64 --decode | jq -r ${1}
