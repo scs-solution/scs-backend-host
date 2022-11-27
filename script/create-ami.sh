@@ -23,7 +23,7 @@ REGION="ap-northeast-2"
 # File into instance configuration will be written.
 #JSON_EC2="ec2-details.json"
 # File into AMI configuration will be written.
-JSON_AMI="ami-details.json"
+JSON_AMI="ami-details-$instanceId.json"
 
 
 #Create a Device Mapping
