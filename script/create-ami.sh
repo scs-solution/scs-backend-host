@@ -135,7 +135,7 @@ aws ec2 deregister-image --region $REGION --image-id $latestAMI
 AMI_ID_TARGET=$(jq -r '.ImageId' $JSON_AMI)
 echo $AMI_ID_TARGET
 
-#만들어진 ami name :
+#만들어진 ami name, 그냥 name이랑 다름:
 echo $AMI_NAME_TARGET
 
 
