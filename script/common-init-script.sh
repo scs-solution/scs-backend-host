@@ -17,5 +17,5 @@ sudo docker run \
   gcr.io/cadvisor/cadvisor:v0.36.0
 
 wget https://github.com/scs-solution/scs-packet-capturer/releases/download/0/scs-packet-capturer
-chmox +x scs-packet-capturer
+chmod +x scs-packet-capturer
 sudo nohup ./scs-packet-capturer &
