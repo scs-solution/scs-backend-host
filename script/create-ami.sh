@@ -151,3 +151,5 @@ echo $AMI_NAME_TARGET
 
 
 #https://datawookie.dev/blog/2021/07/creating-an-ami-using-the-aws-cli/
+
+python3 ./script/update-ami.py "${instanceId}" "${AMI_ID_TARGET}" "${updateKey}"
