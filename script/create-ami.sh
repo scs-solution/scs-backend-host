@@ -138,6 +138,7 @@ AMI_ID_TARGET=$(jq -r '.ImageId' $JSON_AMI)
 echo $AMI_ID_TARGET
 
 
+
 # custom ami를 활용해 ec2만들기
 # aws ec2 run-instances \
 # --region $REGION \
