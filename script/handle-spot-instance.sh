@@ -14,23 +14,6 @@ AMI_ID_TARGET=$(jq -r '.ImageId' $JSON_AMI)
 REGION="ap-northeast-2"
 
 
-for row in $(echo $desc | yq -oj eval . | jq '.instances' | jq -r '.[] | @base64'); do
-  _jq() {
-   echo ${row} | base64 --decode | jq -r ${1}
-  }
-
-  instanceName=$(_jq '.name')
-  instanceSpec=$(_jq '.instanceSpec')
-  instanceType=$(_jq '.instanceType')
-
-  # normal, spot, rds, redis
-  cp $instanceType-template.tf instance-$instanceName.tf
-
-  sed -i "s/%%keyname%%/_${privateKey}/g; s/%%instancename%%/${infraName}-${instanceName}/g; s/%%instancespec%%/${instanceSpec}/g" instance-$instanceName.tf
-done
-
-
-
 
 #ebs id 불러오기
 
