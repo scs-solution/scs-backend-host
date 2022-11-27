@@ -120,6 +120,8 @@ AMI_NAME_TARGET=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16)
 
 aws ec2 create-image --region $REGION --instance-id $instanceId --no-reboot --name $AMI_NAME_TARGET >$JSON_AMI
 
+sleep 120
+
 #기존의 ami 삭제
 aws ec2 deregister-image --region $REGION --image-id $latestAMI
 
