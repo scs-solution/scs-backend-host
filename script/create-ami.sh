@@ -13,8 +13,6 @@ updateKey=$3  # handling 완료했을 떄 backend로 신호보내기
 #AMI_ID_BASE="ami-00399ec92321828f5"
 
 # The name of the custom AMI.
-# 랜덤값 생성해서 넣기
-#AMI_NAME_TARGET=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16)
 
 # Region in which creating AMI.
 REGION="ap-northeast-2"
@@ -116,11 +114,11 @@ JSON_AMI="ami-details.json"
 
 #이제 진짜 ami 생성 
 
-aws ec2 create-image \
-    --region $REGION \
-    --instance-id $instanceId \
-    --no-reboot \
-    >$JSON_AMI
+
+#랜덤값 생성해서 넣기
+AMI_NAME_TARGET=$(tr -dc A-Za-z0-9 </dev/urandom | head -c 16)
+
+aws ec2 create-image --region $REGION --instance-id $instanceId --no-reboot --name $AMI_NAME_TARGET >$JSON_AMI
 
 #기존의 ami 삭제
 aws ec2 deregister-image --region $REGION --image-id $latestAMI
@@ -136,6 +134,9 @@ aws ec2 deregister-image --region $REGION --image-id $latestAMI
 
 AMI_ID_TARGET=$(jq -r '.ImageId' $JSON_AMI)
 echo $AMI_ID_TARGET
+
+#만들어진 ami name :
+echo $AMI_NAME_TARGET
 
 
 
