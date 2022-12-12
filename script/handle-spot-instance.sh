@@ -5,8 +5,11 @@
 #updateKey=$4 #handling 완료했을 떄 backend로 신호보내기
 
 instanceId=$1 # 기존의 종료할 instanceid 
-privateKey=$2 #ssh 접속 할 수 있는 비밀 키 
-desc=$3 #인프라 description name,endpoint,instances
+privateKey=$2 #ssh 접속 할 수 있는 비밀 키
+instanceType=$3
+amiId=$4
+updateKey=$5
+
 
 #기존의 생성된 ami id 
 AMI_ID_TARGET=$(jq -r '.ImageId' $JSON_AMI)
@@ -27,25 +30,85 @@ export eipAddress=$(aws ec2 describe-instances --instance-ids $instanceId --filt
 export ebsSnapshot=$(aws ec2 create-snapshot --volume-id $ebsId)
 
 
+# ami통해 ec2 일반 인스턴스 생성
 
-# ami를 활용해 새로운 ec2만들기
-export newInstanceId=$(aws ec2 run-instances \
---region $REGION \
---image-id $AMI_ID_TARGET \
---count 1 \
---instance-type $instanceType \
---key-name $privateKey  --query 'Instances[0].InstanceId' --output text)
+export newInstanceId=aws ec2 request-spot-instances    --spot-price 0.1  --instance-count 1     --type "one-time"   --launch-specification file://launch-specification.json >error.json
 
-# 새로만든 ec2 instance에 ebs 붙이기 
-aws ec2 attach-volume --volume-id $ebsSnapshot --instance-id $newInstanceId --device /dev/sdf
 
-#기존 ec2 제거 
+
+
+sleep 30
+
+# 일반 인스턴스에 eip 붙이기
+
+aws ec2 associate-address --instance-id $newInstanceId --public-ip $eipAddress
+
+# 기존 spot instance 삭제, delete on termination false
 
 aws ec2 terminate-instances --region $REGION --instance-ids $instanceId
 
+# ebs를 통해 ec2 스팟 인스턴스 새로 생성
+
+export spotInstanceId=$(aws ec2 request-spot-instances \
+    --spot-price 0.1 \
+    --instance-count 1 \
+    --type one-time \
+    --ImageId $ebsSnapshot \
+    )
+
+aws ec2 request-spot-instances    --spot-price 0.1  --instance-count 1     --type "one-time"   --launch-specification '{
+  "ImageId": "'$amiId'",
+  "InstanceType": "t2.micro",
+  "Placement": {
+        "AvailabilityZone": "ap-northeast-2a"
+  }
+}
+'>spotinstance_information.json
+
+export request_ids=$(jq '.SpotInstanceRequests[0].SpotInstanceRequestId' < spotinstance_information.json)
+
+#request_ids에서 큰따옴표 안벗겨져서 큰따옴표 벗기기 
+temp="${request_ids%\"}"
+request_ids="${temp#\"}"
+echo "$request_ids"
+
+aws ec2 wait spot-instance-request-fulfilled  --spot-instance-request-ids $request_ids
+
+export new_spotinstanceId=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_ids --query 'SpotInstanceRequests[0].InstanceId')
+
+#new_spotinstnaceId에서 큰따옴표 안벗겨져서 큰따옴표 벗기기 
+temp="${new_spotinstanceId%\"}"
+new_spotinstanceId="${temp#\"}"
+echo $new_spotinstanceId
+
+
+# 2분 정도 기다리기
+
+sleep 120
+
+
+#  일반 인스턴스에서 eip때고 스팟 인스턴스에 eip 붙이기
+
+
+aws ec2 associate-address --instance-id $new_spotinstanceId --public-ip $eipAddress
+
+# 일반 인스턴스 삭제
+
+aws ec2 terminate-instances --instance-ids $newInstanceId
+
+#################################################
+
+
+# 새로만든 ec2 instance에 ebs 붙이기 
+#aws ec2 attach-volume --volume-id $ebsSnapshot --instance-id $newInstanceId --device /dev/sdf
+
+#기존 ec2 제거 
+
+
+
 #새로만든 instance에 eip붙이기
 
-aws ec2 associate-address --instance-id $newInstanceId --public-ip $eipAddress
+
 
 
 #볼륨 탑재 해제
