@@ -12,19 +12,19 @@ updateKey=$5
 
 
 #기존의 생성된 ami id 
-AMI_ID_TARGET=$(jq -r '.ImageId' $JSON_AMI)
 
 REGION="ap-northeast-2"
 
-
+echo "[handle-spot-instance] start"
 
 #ebs id 불러오기
 
-export ebsId=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instanceId --query 'Volumes[0].VolumeId' --output text)
+ebsId=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Values=$instanceId --query 'Volumes[0].VolumeId' --output text)
 
 
 #기존 ec2의 eip 불러오기
-export eipAddress=$(aws ec2 describe-instances --instance-ids $instanceId --filter --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+eipAddress=$(aws ec2 describe-instances --instance-ids $instanceId --filter --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
+echo "[handle-spot-instance] eip: $eipAddress"
 
 #기존 ec2의 ebs snapshot 따기 
 # export ebsSnapshot=$(aws ec2 create-snapshot --volume-id $ebsId)
@@ -32,8 +32,8 @@ export eipAddress=$(aws ec2 describe-instances --instance-ids $instanceId --filt
 
 # ami통해 ec2 일반 인스턴스 생성
 
-export newInstanceId=$(aws ec2 run-instances --image-id $amiId  --count 1 --instance-type $instanceType --key-name $privateKey --filter --query 'Instances[0].InstanceId' --output text)
-
+newInstanceId=$(aws ec2 run-instances --image-id $amiId  --count 1 --instance-type $instanceType --key-name $privateKey --filter --query 'Instances[0].InstanceId' --output text)
+echo "[handle-spot-instance] new-instance-id: $newInstanceId"
 
 
 
@@ -65,21 +65,18 @@ aws ec2 request-spot-instances    --spot-price 0.1  --instance-count 1     --typ
 }
 '>spotinstance_information.json
 
-export request_ids=$(jq '.SpotInstanceRequests[0].SpotInstanceRequestId' < spotinstance_information.json)
+request_ids=$(jq '.SpotInstanceRequests[0].SpotInstanceRequestId' < spotinstance_information.json)
+echo "[handle-spot-instance] request-id $request_ids"
 
 #request_ids에서 큰따옴표 안벗겨져서 큰따옴표 벗기기 
 temp="${request_ids%\"}"
 request_ids="${temp#\"}"
-echo "$request_ids"
+echo "[handle-spot-instance] request-id $request_ids"
 
 aws ec2 wait spot-instance-request-fulfilled  --spot-instance-request-ids $request_ids
 
-export new_spotinstanceId=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_ids --query 'SpotInstanceRequests[0].InstanceId')
-
-#new_spotinstnaceId에서 큰따옴표 안벗겨져서 큰따옴표 벗기기 
-temp="${new_spotinstanceId%\"}"
-new_spotinstanceId="${temp#\"}"
-echo $new_spotinstanceId
+new_spotinstanceId=$(aws ec2 describe-spot-instance-requests --spot-instance-request-ids $request_ids --query 'SpotInstanceRequests[0].InstanceId' --output text)
+echo "[handle-spot-instance] new-spot-instance-id $new_spotinstanceId"
 
 
 # 2분 정도 기다리기
@@ -96,9 +93,11 @@ aws ec2 associate-address --instance-id $new_spotinstanceId --public-ip $eipAddr
 
 aws ec2 terminate-instances --instance-ids $newInstanceId
 
+new_private_ip=$(aws ec2 describe-instances --instance-ids $instanceId --filter --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
+echo "[handle-spot-instance] new-private-ip $new_private_ip"
 
 
-python3 ./script/update-spot.py "${instanceId}" "${new_spotinstanceId}" "${request_ids}" "${updateKey}"
+python3 ./script/update-spot.py "${instanceId}" "${new_spotinstanceId}" "${request_ids}" "${new_private_ip}" "${updateKey}"
 
 
 #################################################
