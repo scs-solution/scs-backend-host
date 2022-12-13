@@ -97,7 +97,7 @@ new_private_ip=$(aws ec2 describe-instances --instance-ids $instanceId --filter 
 echo "[handle-spot-instance] new-private-ip $new_private_ip"
 
 
-python3 ./script/update-spot.py "${instanceId}" "${new_spotinstanceId}" "${request_ids}" "${new_private_ip}" "${updateKey}"
+python3 ./script/update-spot.py "${instanceId}" "${new_spotinstanceId}" "${new_private_ip}" "${request_ids}" "${updateKey}"
 
 
 #################################################
