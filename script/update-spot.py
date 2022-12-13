@@ -4,12 +4,14 @@ import requests
 
 instanceId = sys.argv[1]
 newInstanceId = sys.argv[2]
-requestId = sys.argv[3]  # SpotInstanceRequestId
-updateKey = sys.argv[4]
+newPrivateIp = sys.argv[3]
+requestId = sys.argv[4]  # SpotInstanceRequestId
+updateKey = sys.argv[5]
 
 updateDto = {
     'instanceId': instanceId,
     'newInstanceId': newInstanceId,
+    'newPrivateIp': newPrivateIp,
     'requestId': requestId,
     'updateKey': updateKey
 }

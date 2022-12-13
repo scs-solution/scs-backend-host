@@ -40,6 +40,13 @@ def createAMIInternal(params):
     )
 
 
+def updateSpotInstanceStateInternal(params):
+    subprocess.Popen(
+        [f'./script/update-spot-instance-state.sh',
+         f'{params["infraName"]}', f'{params["instanceId"]}', f'{params["newInstanceId"]}',
+         f'{params["privateIp"]}', f'{params["requestId"]}'])
+
+
 @app.route('/create-ssh-keypair', methods=['POST'])
 def createSSHKeypair():
     params = request.get_json()
@@ -80,6 +87,13 @@ def handleSpotTermination():
 def createAMI():
     params = request.get_json()
     createAMIInternal(params)
+    return jsonify({"ok": True})
+
+
+@app.route('/update-spot-instance-state', methods=['POST'])
+def updateSpotInstanceState():
+    params = request.get_json()
+    updateSpotInstanceStateInternal(params)
     return jsonify({"ok": True})
 
 
