@@ -29,7 +29,7 @@ def initInstanceInternal(params):
 def handleSpotTerminationInternal(params):
     subprocess.Popen(
         [f'./script/handle-spot-instance.sh',
-            f'{params["target"]}', f'{params["privateKey"]}', f'{params["desc"]}', f'{params["updateKey"]}']
+            f'{params["instanceId"]}', f'{params["privateKey"]}', f'{params["instanceType"]}', f'{params["amiId"]}', f'{params["updateKey"]}']
     )
 
 
