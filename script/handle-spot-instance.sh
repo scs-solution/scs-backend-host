@@ -32,7 +32,7 @@ echo "[handle-spot-instance] eip: $eipAddress"
 
 # ami통해 ec2 일반 인스턴스 생성
 
-newInstanceId=$(aws ec2 run-instances --image-id $amiId  --count 1 --instance-type $instanceType --key-name $privateKey --query 'Instances[0].InstanceId' --output text)
+newInstanceId=$(aws ec2 run-instances --image-id $amiId  --count 1 --instance-type $instanceType --key-name _$privateKey --query 'Instances[0].InstanceId' --output text)
 echo "[handle-spot-instance] new-instance-id: $newInstanceId"
 
 
