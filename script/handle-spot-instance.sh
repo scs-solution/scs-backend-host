@@ -58,7 +58,7 @@ export spotInstanceId=$(aws ec2 request-spot-instances \
 
 aws ec2 request-spot-instances    --spot-price 0.1  --instance-count 1     --type "one-time"   --launch-specification '{
   "ImageId": "'$amiId'",
-  "InstanceType": "t2.micro",
+  "InstanceType": "'$instanceType'",
   "Placement": {
         "AvailabilityZone": "ap-northeast-2a"
   }
@@ -95,6 +95,11 @@ aws ec2 associate-address --instance-id $new_spotinstanceId --public-ip $eipAddr
 # 일반 인스턴스 삭제
 
 aws ec2 terminate-instances --instance-ids $newInstanceId
+
+
+
+python3 ./script/update-spot.py "${instanceId}" "${new_spotinstanceId}" "${request_ids}" "${updateKey}"
+
 
 #################################################
 
