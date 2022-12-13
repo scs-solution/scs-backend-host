@@ -27,12 +27,12 @@ export ebsId=$(aws ec2 describe-volumes --filters Name=attachment.instance-id,Va
 export eipAddress=$(aws ec2 describe-instances --instance-ids $instanceId --filter --query "Reservations[0].Instances[0].PublicIpAddress" --output text)
 
 #기존 ec2의 ebs snapshot 따기 
-export ebsSnapshot=$(aws ec2 create-snapshot --volume-id $ebsId)
+# export ebsSnapshot=$(aws ec2 create-snapshot --volume-id $ebsId)
 
 
 # ami통해 ec2 일반 인스턴스 생성
 
-export newInstanceId=aws ec2 request-spot-instances    --spot-price 0.1  --instance-count 1     --type "one-time"   --launch-specification file://launch-specification.json >error.json
+export newInstanceId=$(aws ec2 run-instances --image-id $amiId  --count 1 --instance-type $instanceType --key-name $privateKey --filter --query 'Instances[0].InstanceId' --output text)
 
 
 
@@ -49,12 +49,12 @@ aws ec2 terminate-instances --region $REGION --instance-ids $instanceId
 
 # ebs를 통해 ec2 스팟 인스턴스 새로 생성
 
-export spotInstanceId=$(aws ec2 request-spot-instances \
-    --spot-price 0.1 \
-    --instance-count 1 \
-    --type one-time \
-    --ImageId $ebsSnapshot \
-    )
+# export spotInstanceId=$(aws ec2 request-spot-instances \
+#     --spot-price 0.1 \
+#     --instance-count 1 \
+#     --type one-time \
+#     --ImageId $ebsSnapshot \
+#     )
 
 aws ec2 request-spot-instances    --spot-price 0.1  --instance-count 1     --type "one-time"   --launch-specification '{
   "ImageId": "'$amiId'",
