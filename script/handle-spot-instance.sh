@@ -93,7 +93,7 @@ aws ec2 associate-address --instance-id $new_spotinstanceId --public-ip $eipAddr
 
 aws ec2 terminate-instances --instance-ids $newInstanceId
 
-new_private_ip=$(aws ec2 describe-instances --instance-ids $instanceId --filter --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
+new_private_ip=$(aws ec2 describe-instances --instance-ids $new_spotinstanceId --filter --query "Reservations[0].Instances[0].PrivateIpAddress" --output text)
 echo "[handle-spot-instance] new-private-ip $new_private_ip"
 
 
