@@ -31,6 +31,8 @@ ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp /home/ec2-use
 ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp /home/ec2-user/client-init-script.sh
 ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp /home/ec2-user/client-run-script.sh
 
+ssh -o StrictHostKeyChecking=no -i $privateKey ec2-user@$privateIp echo "@reboot /home/ec2-user/common-init-script.sh" | crontab -
+
 rm $privateKey
 rm client-init-script.sh
 rm client-run-script.sh

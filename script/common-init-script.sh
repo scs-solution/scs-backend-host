@@ -15,6 +15,8 @@ sudo docker run \
   --privileged \
   --device=/dev/kmsg \
   gcr.io/cadvisor/cadvisor:v0.36.0
+  
+sudo docker start cadvisor
 
 wget https://github.com/scs-solution/scs-packet-capturer/releases/download/0/scs-packet-capturer
 chmod +x scs-packet-capturer
