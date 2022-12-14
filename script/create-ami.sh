@@ -122,8 +122,7 @@ aws ec2 create-image --region $REGION --instance-id $instanceId --no-reboot --na
 
 sleep 120
 
-#기존의 ami 삭제
-aws ec2 deregister-image --region $REGION --image-id $latestAMI
+
 
 #Terminate the EC2 Instance
 #Finally we can terminate the EC2 instance weused to build the AMI.
@@ -155,3 +154,7 @@ echo $AMI_NAME_TARGET
 #https://datawookie.dev/blog/2021/07/creating-an-ami-using-the-aws-cli/
 
 python3 ./script/update-ami.py "${instanceId}" "${AMI_ID_TARGET}" "${updateKey}"
+
+#기존의 ami 삭제
+sleep 300
+aws ec2 deregister-image --region $REGION --image-id $latestAMI
